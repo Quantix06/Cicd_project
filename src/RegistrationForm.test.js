@@ -76,7 +76,7 @@ test("renders the submit button", () => {
  * @function managetextinput
  * @description Teste la gestion de la saisie dans les champs de texte
  */
-test("throw an error when the name contains special characters", () => {
+test("check when the name contains special characters", () => {
   render(<RegistrationForm />);
   const input = screen.getByLabelText("Nom");
   fireEvent.change(input, { target: { value: "Dupont!" } });
@@ -85,12 +85,40 @@ test("throw an error when the name contains special characters", () => {
   );
   expect(errorMessage).toBeInTheDocument();
 });
-test("throw an error when the prenom contains special characters", () => {
+test("check the prenom contains special characters", () => {
   render(<RegistrationForm />);
   const input = screen.getByLabelText("Prénom");
   fireEvent.change(input, { target: { value: "Jean!" } });
   const errorMessage = screen.getByText(
     "Le texte ne doit pas contenir de caractères spéciaux.",
+  );
+  expect(errorMessage).toBeInTheDocument();
+});
+test("check the prenom contains special characters", () => {
+  render(<RegistrationForm />);
+  const input = screen.getByLabelText("Prénom");
+  fireEvent.change(input, { target: { value: "Jean!" } });
+  const errorMessage = screen.getByText(
+    "Le texte ne doit pas contenir de caractères spéciaux.",
+  );
+  expect(errorMessage).toBeInTheDocument();
+});
+test("check the ville contains special characters", () => {
+  render(<RegistrationForm />);
+  const input = screen.getByLabelText("Ville");
+  fireEvent.change(input, { target: { value: "Paris!" } });
+  const errorMessage = screen.getByText(
+    "Le texte ne doit pas contenir de caractères spéciaux.",
+  );
+  expect(errorMessage).toBeInTheDocument();
+});
+
+test("check the email format is invalid", () => {
+  render(<RegistrationForm />);
+  const input = screen.getByLabelText("Adresse e-mail");
+  fireEvent.change(input, { target: { value: "invalidemail" } });
+  const errorMessage = screen.getByText(
+    "Le format de l'adresse e-mail est invalide.",
   );
   expect(errorMessage).toBeInTheDocument();
 });
