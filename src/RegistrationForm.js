@@ -6,6 +6,7 @@ import {
   checkfuturedate,
   checkpostalcodeformat,
 } from "./formchecker.js";
+import { saveFormToLocalStorage } from "./formStorage.js";
 function RegistrationForm() {
   const [formData, setFormData] = useState({
     nom: "",
@@ -198,7 +199,11 @@ function RegistrationForm() {
           </div>
         </div>
 
-        <button type="submit" className="btn-submit">
+        <button
+          type="submit"
+          className="btn-submit"
+          onClick={saveFormToLocalStorage(formData)}
+        >
           Envoyer
         </button>
 
