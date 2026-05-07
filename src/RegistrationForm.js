@@ -49,6 +49,7 @@ function RegistrationForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    saveFormToLocalStorage(formData);
     console.log("Formulaire soumis :", formData);
     setSubmitted(true);
     setTimeout(() => setSubmitted(false), 4000);
@@ -199,11 +200,7 @@ function RegistrationForm() {
           </div>
         </div>
 
-        <button
-          type="submit"
-          className="btn-submit"
-          onClick={saveFormToLocalStorage(formData)}
-        >
+        <button type="submit" className="btn-submit">
           Envoyer
         </button>
 

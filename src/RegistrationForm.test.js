@@ -143,3 +143,35 @@ test("check the email format is invalid", () => {
   );
   expect(errorMessage).toBeInTheDocument();
 });
+
+test("check if the data is stored in localStorage when the form is submitted", () => {
+  const consoleSpy = jest.spyOn(console, "log");
+  render(<RegistrationForm />);
+
+  fireEvent.change(screen.getByLabelText("Nom"), {
+    target: { value: "Dupont" },
+  });
+  fireEvent.change(screen.getByLabelText("Prénom"), {
+    target: { value: "Jean" },
+  });
+  fireEvent.change(screen.getByLabelText("Adresse e-mail"), {
+    target: { value: "jean.dupont@email.com" },
+  });
+  fireEvent.change(screen.getByLabelText("Date de naissance"), {
+    target: { value: "1990-01-01" },
+  });
+  fireEvent.change(screen.getByLabelText("Ville"), {
+    target: { value: "Paris" },
+  });
+  fireEvent.change(screen.getByLabelText("Code postal"), {
+    target: { value: "75001" },
+  });
+
+  fireEvent.click(screen.getByRole("button", { name: /envoyer/i }));
+
+  expect(consoleSpy).toHaveBeenCalledWith(
+    "Formulaire soumis :",
+    expect.any(Object),
+  );
+  consoleSpy.mockRestore();
+});

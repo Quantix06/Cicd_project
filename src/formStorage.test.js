@@ -2,7 +2,6 @@ import { saveFormToLocalStorage } from "./formStorage";
 
 describe("formStorage", () => {
   beforeEach(() => {
-    // Nettoyage du localStorage avant chaque test
     localStorage.clear();
   });
 
