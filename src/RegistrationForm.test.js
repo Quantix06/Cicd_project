@@ -31,7 +31,7 @@ test("renders the prenom field", () => {
 
 test("renders the email field", () => {
   render(<RegistrationForm />);
-  const input = screen.getByLabelText("adresse e-mail");
+  const input = screen.getByLabelText("Adresse e-mail");
   expect(input).toBeInTheDocument();
   expect(input).toHaveAttribute("id", "champ_adresse_email");
   expect(input).toHaveAttribute("type", "email");
@@ -40,7 +40,7 @@ test("renders the email field", () => {
 
 test("renders the date de naissance field", () => {
   render(<RegistrationForm />);
-  const input = screen.getByLabelText("date de naissance");
+  const input = screen.getByLabelText("Date de naissance");
   expect(input).toBeInTheDocument();
   expect(input).toHaveAttribute("id", "champ_date_de_naissance");
   expect(input).toHaveAttribute("type", "date");
@@ -49,7 +49,7 @@ test("renders the date de naissance field", () => {
 
 test("renders the ville field", () => {
   render(<RegistrationForm />);
-  const input = screen.getByLabelText("ville");
+  const input = screen.getByLabelText("Ville");
   expect(input).toBeInTheDocument();
   expect(input).toHaveAttribute("id", "champ_ville");
   expect(input).toBeRequired();
@@ -57,7 +57,7 @@ test("renders the ville field", () => {
 
 test("renders the code postal field", () => {
   render(<RegistrationForm />);
-  const input = screen.getByLabelText("code postal");
+  const input = screen.getByLabelText("Code postal");
   expect(input).toBeInTheDocument();
   expect(input).toHaveAttribute("id", "champ_code_postal");
   expect(input).toHaveAttribute("pattern", "[0-9]{5}");
