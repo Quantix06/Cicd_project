@@ -5,15 +5,13 @@ import RegistrationForm from "./RegistrationForm";
 
 test("renders the registration form title", () => {
   render(<RegistrationForm />);
-  const title = screen.getByText(/inscription/i);
+  const title = screen.getByText("Inscription");
   expect(title).toBeInTheDocument();
 });
 
 test("renders the subtitle", () => {
   render(<RegistrationForm />);
-  const subtitle = screen.getByText(
-    /remplissez vos informations personnelles/i,
-  );
+  const subtitle = screen.getByText("Remplissez vos informations personnelles");
   expect(subtitle).toBeInTheDocument();
 });
 
@@ -33,7 +31,7 @@ test("renders the prenom field", () => {
 
 test("renders the email field", () => {
   render(<RegistrationForm />);
-  const input = screen.getByLabelText(/adresse e-mail/i);
+  const input = screen.getByLabelText("adresse e-mail");
   expect(input).toBeInTheDocument();
   expect(input).toHaveAttribute("id", "champ_adresse_email");
   expect(input).toHaveAttribute("type", "email");
@@ -42,7 +40,7 @@ test("renders the email field", () => {
 
 test("renders the date de naissance field", () => {
   render(<RegistrationForm />);
-  const input = screen.getByLabelText(/date de naissance/i);
+  const input = screen.getByLabelText("date de naissance");
   expect(input).toBeInTheDocument();
   expect(input).toHaveAttribute("id", "champ_date_de_naissance");
   expect(input).toHaveAttribute("type", "date");
@@ -51,7 +49,7 @@ test("renders the date de naissance field", () => {
 
 test("renders the ville field", () => {
   render(<RegistrationForm />);
-  const input = screen.getByLabelText(/ville/i);
+  const input = screen.getByLabelText("ville");
   expect(input).toBeInTheDocument();
   expect(input).toHaveAttribute("id", "champ_ville");
   expect(input).toBeRequired();
@@ -59,7 +57,7 @@ test("renders the ville field", () => {
 
 test("renders the code postal field", () => {
   render(<RegistrationForm />);
-  const input = screen.getByLabelText(/code postal/i);
+  const input = screen.getByLabelText("code postal");
   expect(input).toBeInTheDocument();
   expect(input).toHaveAttribute("id", "champ_code_postal");
   expect(input).toHaveAttribute("pattern", "[0-9]{5}");
@@ -68,7 +66,7 @@ test("renders the code postal field", () => {
 
 test("renders the submit button", () => {
   render(<RegistrationForm />);
-  const button = screen.getByRole("button", { name: /envoyer/i });
+  const button = screen.getByRole("button", { name: "envoyer" });
   expect(button).toBeInTheDocument();
   expect(button).toHaveAttribute("type", "submit");
 });
@@ -80,7 +78,7 @@ test("renders the submit button", () => {
  */
 test("throw an error when the name contains special characters", () => {
   render(<RegistrationForm />);
-  const input = screen.getByLabelText(/nom/i);
+  const input = screen.getByLabelText("nom");
   fireEvent.change(input, { target: { value: "Dupont!" } });
   expect(() => managetextinput({})).toThrow(
     "Le nom ne doit pas contenir de caractères spéciaux",
@@ -88,7 +86,7 @@ test("throw an error when the name contains special characters", () => {
 });
 test("throw an error when the prenom contains special characters", () => {
   render(<RegistrationForm />);
-  const input = screen.getByLabelText(/prénom/i);
+  const input = screen.getByLabelText("prénom");
   fireEvent.change(input, { target: { value: "Jean!" } });
   expect(() => managetextinput({})).toThrow(
     "Le texte ne doit pas contenir de caractères spéciaux.",
