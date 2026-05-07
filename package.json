@@ -43,6 +43,7 @@
   "devDependencies": {
     "gh-pages": "^6.3.0",
     "jest": "^27.5.1",
+    "jsdoc": "^4.0.5",
     "react-test-renderer": "^19.2.5"
   }
 }
