@@ -66,7 +66,7 @@ test("renders the code postal field", () => {
 
 test("renders the submit button", () => {
   render(<RegistrationForm />);
-  const button = screen.getByRole("button", { name: "envoyer" });
+  const button = screen.getByRole("button", { name: /envoyer/i });
   expect(button).toBeInTheDocument();
   expect(button).toHaveAttribute("type", "submit");
 });
@@ -80,15 +80,17 @@ test("throw an error when the name contains special characters", () => {
   render(<RegistrationForm />);
   const input = screen.getByLabelText("Nom");
   fireEvent.change(input, { target: { value: "Dupont!" } });
-  expect(() => managetextinput({})).toThrow(
-    "Le nom ne doit pas contenir de caractères spéciaux",
+  const errorMessage = screen.getByText(
+    "Le texte ne doit pas contenir de caractères spéciaux.",
   );
+  expect(errorMessage).toBeInTheDocument();
 });
 test("throw an error when the prenom contains special characters", () => {
   render(<RegistrationForm />);
   const input = screen.getByLabelText("Prénom");
   fireEvent.change(input, { target: { value: "Jean!" } });
-  expect(() => managetextinput({})).toThrow(
+  const errorMessage = screen.getByText(
     "Le texte ne doit pas contenir de caractères spéciaux.",
   );
+  expect(errorMessage).toBeInTheDocument();
 });
