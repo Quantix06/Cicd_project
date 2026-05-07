@@ -52,7 +52,7 @@ jobs:
     permissions:
       pages: write
       id-token: write
-    #deploy to github
+    #deploy to github pages
     steps:
       - name: Deploy to Github Pages
         id: deployment
