@@ -20,18 +20,16 @@ function RegistrationForm() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    const errormsg = managetextinput(value);
-    if (name === "nom") setNomError(errormsg);
-    else if (name === "prenom") setPrenomError(errormsg);
-    else if (name === "email") setEmailError(errormsg);
-    else if (name === "dateNaissance") setDateNaissanceError(errormsg);
-    else if (name === "ville") setVilleError(errormsg);
-  };
-  const handleChangeMail = (e) => {
-    const { mail, value } = e.target;
-    setFormData((prev) => ({ ...prev, [mail]: value }));
-    const errormsg = checkemailformat(value);
-    if (mail === "email") setEmailError(errormsg);
+
+    if (name === "email") {
+      setEmailError(checkemailformat(value));
+    } else {
+      const errormsg = managetextinput(value);
+      if (name === "nom") setNomError(errormsg);
+      else if (name === "prenom") setPrenomError(errormsg);
+      else if (name === "dateNaissance") setDateNaissanceError(errormsg);
+      else if (name === "ville") setVilleError(errormsg);
+    }
   };
 
   const handleSubmit = (e) => {
@@ -126,6 +124,14 @@ function RegistrationForm() {
               onChange={handleChange}
               required
             />
+            {dateNaissanceError && (
+              <span
+                className="error-text"
+                style={{ color: "red", fontSize: "0.8rem", marginTop: "5px" }}
+              >
+                {dateNaissanceError}
+              </span>
+            )}
           </div>
 
           <div className="form-group">
