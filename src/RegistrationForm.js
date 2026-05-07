@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { managetextinput } from "./formchecker.js";
+import { managetextinput, checkemailformat } from "./formchecker.js";
 function RegistrationForm() {
   const [formData, setFormData] = useState({
     nom: "",
@@ -27,12 +27,11 @@ function RegistrationForm() {
     else if (name === "dateNaissance") setDateNaissanceError(errormsg);
     else if (name === "ville") setVilleError(errormsg);
   };
-    const handleChangeMail = (e) => {
+  const handleChangeMail = (e) => {
     const { mail, value } = e.target;
     setFormData((prev) => ({ ...prev, [mail]: value }));
     const errormsg = checkemailformat(value);
     if (mail === "email") setEmailError(errormsg);
-  };
   };
 
   const handleSubmit = (e) => {
@@ -107,6 +106,14 @@ function RegistrationForm() {
               onChange={handleChange}
               required
             />
+            {emailError && (
+              <span
+                className="error-text"
+                style={{ color: "red", fontSize: "0.8rem", marginTop: "5px" }}
+              >
+                {emailError}
+              </span>
+            )}
           </div>
 
           <div className="form-group">
