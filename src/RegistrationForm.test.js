@@ -91,6 +91,6 @@ test("throw an error when the prenom contains special characters", () => {
   const input = screen.getByLabelText(/prénom/i);
   fireEvent.change(input, { target: { value: "Jean!" } });
   expect(() => managetextinput({})).toThrow(
-    "Le prénom ne doit pas contenir de caractères spéciaux",
+    "Le texte ne doit pas contenir de caractères spéciaux.",
   );
 });
