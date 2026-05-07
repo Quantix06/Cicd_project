@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/Cicd_project/static/css/main.c8a03666.css",
+    "main.js": "/Cicd_project/static/js/main.889f9746.js",
+    "static/js/453.e9e7ec89.chunk.js": "/Cicd_project/static/js/453.e9e7ec89.chunk.js",
+    "static/media/logo.svg": "/Cicd_project/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
+    "index.html": "/Cicd_project/index.html",
+    "main.c8a03666.css.map": "/Cicd_project/static/css/main.c8a03666.css.map",
+    "main.889f9746.js.map": "/Cicd_project/static/js/main.889f9746.js.map",
+    "453.e9e7ec89.chunk.js.map": "/Cicd_project/static/js/453.e9e7ec89.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.c8a03666.css",
+    "static/js/main.889f9746.js"
+  ]
+}
