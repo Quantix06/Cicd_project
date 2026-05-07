@@ -94,21 +94,42 @@ test("check the prenom contains special characters", () => {
   );
   expect(errorMessage).toBeInTheDocument();
 });
-test("check the prenom contains special characters", () => {
-  render(<RegistrationForm />);
-  const input = screen.getByLabelText("Prénom");
-  fireEvent.change(input, { target: { value: "Jean!" } });
-  const errorMessage = screen.getByText(
-    "Le texte ne doit pas contenir de caractères spéciaux.",
-  );
-  expect(errorMessage).toBeInTheDocument();
-});
 test("check the ville contains special characters", () => {
   render(<RegistrationForm />);
   const input = screen.getByLabelText("Ville");
   fireEvent.change(input, { target: { value: "Paris!" } });
   const errorMessage = screen.getByText(
     "Le texte ne doit pas contenir de caractères spéciaux.",
+  );
+  expect(errorMessage).toBeInTheDocument();
+});
+
+test("check the date of birth is under 18", () => {
+  render(<RegistrationForm />);
+  const input = screen.getByLabelText("Date de naissance");
+  fireEvent.change(input, { target: { value: "2015-01-01" } });
+  const errorMessage = screen.getByText(
+    "Vous devez avoir au moins 18 ans pour vous inscrire.",
+  );
+  expect(errorMessage).toBeInTheDocument();
+});
+
+test("check the date of birth is in the future", () => {
+  render(<RegistrationForm />);
+  const input = screen.getByLabelText("Date de naissance");
+  fireEvent.change(input, { target: { value: "2050-01-01" } });
+  const errorMessage = screen.getByText(
+    "La date de naissance ne peut pas être dans le futur.",
+  );
+  expect(errorMessage).toBeInTheDocument();
+});
+
+test("check the postal code format is invalid", () => {
+  render(<RegistrationForm />);
+  const input = screen.getByLabelText("Code postal");
+  fireEvent.change(input, { target: { value: "1234A" } });
+  const errorMessage = screen.getByText(
+    "Le code postal doit contenir 5 chiffres.",
   );
   expect(errorMessage).toBeInTheDocument();
 });

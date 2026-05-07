@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { managetextinput, checkemailformat } from "./formchecker.js";
+import {
+  managetextinput,
+  checkemailformat,
+  checkdateformatage,
+  checkfuturedate,
+  checkpostalcodeformat,
+} from "./formchecker.js";
 function RegistrationForm() {
   const [formData, setFormData] = useState({
     nom: "",
@@ -14,6 +20,7 @@ function RegistrationForm() {
   const [emailError, setEmailError] = useState("");
   const [dateNaissanceError, setDateNaissanceError] = useState("");
   const [villeError, setVilleError] = useState("");
+  const [codePostalError, setCodePostalError] = useState("");
 
   const [submitted, setSubmitted] = useState(false);
 
@@ -23,11 +30,18 @@ function RegistrationForm() {
 
     if (name === "email") {
       setEmailError(checkemailformat(value));
+    } else if (name === "dateNaissance") {
+      let error = checkfuturedate(value);
+      if (!error && value) {
+        error = checkdateformatage(new Date(value));
+      }
+      setDateNaissanceError(error);
+    } else if (name === "codePostal") {
+      setCodePostalError(checkpostalcodeformat(value));
     } else {
       const errormsg = managetextinput(value);
       if (name === "nom") setNomError(errormsg);
       else if (name === "prenom") setPrenomError(errormsg);
-      else if (name === "dateNaissance") setDateNaissanceError(errormsg);
       else if (name === "ville") setVilleError(errormsg);
     }
   };
@@ -168,6 +182,19 @@ function RegistrationForm() {
               title="Le code postal doit contenir 5 chiffres"
               required
             />
+            {codePostalError && (
+              <span
+                className="error-text"
+                style={{
+                  color: "red",
+                  fontSize: "0.8rem",
+                  marginTop: "5px",
+                  display: "block",
+                }}
+              >
+                {codePostalError}
+              </span>
+            )}
           </div>
         </div>
 

@@ -14,3 +14,27 @@ export function checkemailformat(email) {
   }
   return "";
 }
+
+export function checkdateformatage(date) {
+  let age = Math.abs(new Date().getUTCFullYear() - date.getUTCFullYear());
+  if (age < 18) {
+    return "Vous devez avoir au moins 18 ans pour vous inscrire.";
+  }
+  return "";
+}
+
+export function checkfuturedate(date) {
+  const today = new Date();
+  const inputDate = new Date(date);
+  if (inputDate > today) {
+    return "La date de naissance ne peut pas être dans le futur.";
+  }
+  return "";
+}
+export function checkpostalcodeformat(postalCode) {
+  const postalCodeRegex = /^\d{5}$/;
+  if (!postalCodeRegex.test(postalCode)) {
+    return "Le code postal doit contenir 5 chiffres.";
+  }
+  return "";
+}
