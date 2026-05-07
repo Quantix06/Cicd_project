@@ -78,7 +78,7 @@ test("renders the submit button", () => {
  */
 test("throw an error when the name contains special characters", () => {
   render(<RegistrationForm />);
-  const input = screen.getByLabelText("nom");
+  const input = screen.getByLabelText("Nom");
   fireEvent.change(input, { target: { value: "Dupont!" } });
   expect(() => managetextinput({})).toThrow(
     "Le nom ne doit pas contenir de caractères spéciaux",
@@ -86,7 +86,7 @@ test("throw an error when the name contains special characters", () => {
 });
 test("throw an error when the prenom contains special characters", () => {
   render(<RegistrationForm />);
-  const input = screen.getByLabelText("prénom");
+  const input = screen.getByLabelText("Prénom");
   fireEvent.change(input, { target: { value: "Jean!" } });
   expect(() => managetextinput({})).toThrow(
     "Le texte ne doit pas contenir de caractères spéciaux.",
