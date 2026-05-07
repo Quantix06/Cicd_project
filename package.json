@@ -1,4 +1,5 @@
 {
+  "homepage": "https://Quantix06.github.io/Cicd_project",
   "name": "my-app",
   "version": "0.1.0",
   "private": true,
@@ -16,7 +17,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -37,6 +40,7 @@
     ]
   },
   "devDependencies": {
-    "react-test-renderer": "^19.2.5"
+    "react-test-renderer": "^19.2.5",
+    "gh-pages": "^6.1.1"
   }
 }
