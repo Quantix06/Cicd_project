@@ -28,23 +28,36 @@ jobs:
           npm run jsdoc
           npm run build --if-present
           npm test
+
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         env:
           CODECOV_TOKEN: ${{secrets.CODECOV_TOKEN}}
+
       - name: authenticate with npm
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
-      - name: build and publish package on NPM
+      # --- VÉRIFICATION DE LA VERSION DU PACKAGE ---
+      - name: Check package versions
+        id: check-version
         run: |
-          git config --global user.email "marchalquentin06@gmail.com"
-          git config --global user.name "Marchal Quentin"
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          LOCAL_VERSION=$(node -p "require('./package.json').version")
+
+          REMOTE_VERSION=$(npm view $PACKAGE_NAME version 2>/dev/null || echo "0.0.0")
+
+          echo "local_version=$LOCAL_VERSION" >> $GITHUB_OUTPUT
+          echo "remote_version=$REMOTE_VERSION" >> $GITHUB_OUTPUT
+
+          echo "Version locale : $LOCAL_VERSION"
+          echo "Version distante (NPM) : $REMOTE_VERSION"
+
+      - name: build and publish package on NPM
+        # La condition vérifie l'étape précédente pour comparer les versions locale et distante du package. Si elles sont différentes, cela signifie qu'il y a une nouvelle version à publier.
+        if: steps.check-version.outputs.local_version != steps.check-version.outputs.remote_version
+        run: |
           npm run build-npm-ci
-          npm version patch
           npm publish
-          git add .
-          git commit -m "updated version" 
-          git push
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -59,7 +72,6 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-
     needs: build_test
 
     environment:
@@ -69,6 +81,7 @@ jobs:
     permissions:
       pages: write
       id-token: write
+
     #deploy to github pages
     steps:
       - name: Deploy to Github Pages
