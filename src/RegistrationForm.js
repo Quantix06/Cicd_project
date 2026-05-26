@@ -42,8 +42,8 @@ function RegistrationForm() {
     } else {
       const errormsg = managetextinput(value);
       if (name === "nom") setNomError(errormsg);
-      else if (name === "prenom") setPrenomError(errormsg);
-      else if (name === "ville") setVilleError(errormsg);
+      if (name === "prenom") setPrenomError(errormsg);
+      if (name === "ville") setVilleError(errormsg);
     }
   };
 

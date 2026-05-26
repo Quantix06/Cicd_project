@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import RegistrationForm from "./RegistrationForm";
+import RegistrationForm from "./registrationForm";
 
 // ===== Rendu des champs =====
 
