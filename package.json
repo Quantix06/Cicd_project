@@ -1,7 +1,7 @@
 {
   "homepage": "https://Quantix06.github.io/Cicd_project",
   "name": "quentin-cicd-1",
-  "version": "0.1.1.1",
+  "version": "0.1.2",
   "private": false,
   "dependencies": {
     "@testing-library/dom": "^10.4.1",
