@@ -23,7 +23,7 @@ function App() {
       }
     }
     countUsers();
-  }, []);
+  }, [port]);
 
   const incrementCount = () => {
     setCount((prevCount) => prevCount + 1);
