@@ -103,13 +103,13 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
       - name: Build Frontend Docker image
-        run: docker build -t quantix06/frontend -f DockerfileReact .
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend -f DockerfileReact .
 
       - name: Push Frontend Docker image
-        run: docker push quantix06/frontend
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/frontend
 
       - name: Build Backend Docker image
-        run: docker build -t ${{ vars.DOCKERHUB_USERNAME }}/backend -f DockerfileBackend .
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/backend -f DockerfileBackend .
 
       - name: Push Backend Docker image
-        run: docker push ${{ vars.DOCKERHUB_USERNAME }}/backend
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/backend
