@@ -71,6 +71,9 @@ services:
     depends_on:
       - backend
     command: npm start
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000 || exit 1"]
+      start_period: 10s
   healthcheck_everyone:
     image: nginx
     depends_on:

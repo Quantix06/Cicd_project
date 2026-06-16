@@ -113,3 +113,32 @@ jobs:
 
       - name: Push Backend Docker image
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/backend
+
+  test-docker:
+    runs-on: ubuntu-latest
+    needs: build_test
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Start Docker Compose services
+        run: docker compose up -d
+
+      - name: Show running containers
+        run: docker ps
+
+      - name: Wait for services to be ready
+        run: sleep 30
+
+      - name: Check db health
+        run: docker inspect --format "{{json .State.Health.Status }}" $(docker compose ps -q db) | jq '. == "healthy"'
+
+      - name: Check adminer health
+        run: docker inspect --format "{{json .State.Health.Status }}" $(docker compose ps -q adminer) | jq '. == "healthy"'
+
+      - name: Check backend health
+        run: docker inspect --format "{{json .State.Health.Status }}" $(docker compose ps -q backend) | jq '. == "healthy"'
+
+      - name: Check react health
+        run: docker inspect --format "{{json .State.Health.Status }}" $(docker compose ps -q react) | jq '. == "healthy"'
