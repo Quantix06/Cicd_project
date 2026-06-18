@@ -6,7 +6,8 @@ import {
   checkfuturedate,
   checkpostalcodeformat,
 } from "./formchecker.js";
-import { saveFormToLocalStorage } from "./formStorage.js";
+import { saveFormToDatabase } from "./formStorage.js";
+
 function RegistrationForm() {
   const [formData, setFormData] = useState({
     nom: "",
@@ -24,6 +25,8 @@ function RegistrationForm() {
   const [codePostalError, setCodePostalError] = useState("");
 
   const [submitted, setSubmitted] = useState(false);
+  const [serverError, setServerError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -47,12 +50,29 @@ function RegistrationForm() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    saveFormToLocalStorage(formData);
-    console.log("Formulaire soumis :", formData);
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 4000);
+    setServerError("");
+    setIsSubmitting(true);
+
+    try {
+      await saveFormToDatabase(formData);
+      console.log("Formulaire soumis :", formData);
+      setSubmitted(true);
+      setFormData({
+        nom: "",
+        prenom: "",
+        email: "",
+        dateNaissance: "",
+        ville: "",
+        codePostal: "",
+      });
+      setTimeout(() => setSubmitted(false), 4000);
+    } catch (error) {
+      setServerError(error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -200,9 +220,15 @@ function RegistrationForm() {
           </div>
         </div>
 
-        <button type="submit" className="btn-submit">
-          Envoyer
+        <button type="submit" className="btn-submit" disabled={isSubmitting}>
+          {isSubmitting ? "Envoi en cours..." : "Envoyer"}
         </button>
+
+        {serverError && (
+          <div className="error-message">
+            ✕ {serverError}
+          </div>
+        )}
 
         {submitted && (
           <div className="success-message">

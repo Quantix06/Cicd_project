@@ -1,6 +1,27 @@
 import { saveFormToLocalStorage } from "./formStorage";
 
-test("vérifie si les données sont correctement stockées dans le localStorage", () => {
+// Mock axios - use a stable reference that jest.mock can access
+const mockAxiosPost = jest.fn();
+const mockAxiosGet = jest.fn();
+
+jest.mock("axios", () => ({
+  __esModule: true,
+  default: {
+    create: jest.fn(() => ({
+      post: (...args) => mockAxiosPost(...args),
+      get: (...args) => mockAxiosGet(...args),
+    })),
+  },
+}));
+
+describe("saveFormToDatabase", () => {
+  let saveFormToDatabase;
+
+  beforeAll(() => {
+    const mod = require("./formStorage");
+    saveFormToDatabase = mod.saveFormToDatabase;
+  });
+
   const mockFormData = {
     nom: "Dupont",
     prenom: "Jean",
@@ -10,17 +31,73 @@ test("vérifie si les données sont correctement stockées dans le localStorage"
     codePostal: "75001",
   };
 
-  saveFormToLocalStorage(mockFormData);
+  beforeEach(() => {
+    mockAxiosPost.mockReset();
+    mockAxiosGet.mockReset();
+  });
 
-  const storedData = localStorage.getItem("registrationForm");
-  expect(storedData).not.toBeNull();
-  expect(JSON.parse(storedData)).toEqual(mockFormData);
+  test("appelle l'API avec les bonnes données", async () => {
+    mockAxiosPost.mockResolvedValue({
+      data: { message: "Utilisateur inscrit avec succès", id: 1 },
+    });
+
+    await saveFormToDatabase(mockFormData);
+
+    expect(mockAxiosPost).toHaveBeenCalledWith("/register", mockFormData);
+  });
+
+  test("retourne les données de la réponse en cas de succès", async () => {
+    const mockResponse = { message: "Utilisateur inscrit avec succès", id: 1 };
+    mockAxiosPost.mockResolvedValue({ data: mockResponse });
+
+    const result = await saveFormToDatabase(mockFormData);
+
+    expect(result).toEqual(mockResponse);
+  });
+
+  test("lance une erreur avec le message du serveur", async () => {
+    mockAxiosPost.mockRejectedValue({
+      response: { data: { detail: "Cet email est déjà utilisé" } },
+    });
+
+    await expect(saveFormToDatabase(mockFormData)).rejects.toThrow(
+      "Cet email est déjà utilisé"
+    );
+  });
+
+  test("lance une erreur de connexion si pas de réponse serveur", async () => {
+    mockAxiosPost.mockRejectedValue(new Error("Network Error"));
+
+    await expect(saveFormToDatabase(mockFormData)).rejects.toThrow(
+      "Erreur de connexion au serveur"
+    );
+  });
 });
-/*pensez à ajouter un before each pour nettoyer le localStorage avant chaque test*/
-beforeEach(() => {
-  localStorage.clear();
-});
-test("vérifie si les données sont non correctes", () => {
-  const storedData = localStorage.getItem("registrationForm");
-  expect(storedData).toBeNull();
+
+describe("saveFormToLocalStorage (deprecated)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  test("vérifie si les données sont correctement stockées dans le localStorage", () => {
+    const mockFormData = {
+      nom: "Dupont",
+      prenom: "Jean",
+      email: "jean.dupont@email.com",
+      dateNaissance: "1990-01-01",
+      ville: "Paris",
+      codePostal: "75001",
+    };
+
+    saveFormToLocalStorage(mockFormData);
+
+    const storedData = localStorage.getItem("registrationForm");
+    expect(storedData).not.toBeNull();
+    expect(JSON.parse(storedData)).toEqual(mockFormData);
+  });
+
+  test("vérifie si les données sont non correctes", () => {
+    const storedData = localStorage.getItem("registrationForm");
+    expect(storedData).toBeNull();
+  });
 });

@@ -1,14 +1,51 @@
 import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom";
 import logo from "./logo.svg";
 import "./App.css";
 import RegistrationForm from "./RegistrationForm";
+import LoginForm from "./LoginForm";
+import UserList from "./UserList";
 import axios from "axios";
 
-function App() {
+function Navigation({ adminToken, onLogout }) {
+  const location = useLocation();
+
+  return (
+    <nav className="app-nav">
+      <Link
+        to="/"
+        className={`nav-link ${location.pathname === "/" ? "active" : ""}`}
+      >
+        Inscription
+      </Link>
+      <Link
+        to="/users"
+        className={`nav-link ${location.pathname === "/users" ? "active" : ""}`}
+      >
+        Utilisateurs
+      </Link>
+      {!adminToken ? (
+        <Link
+          to="/login"
+          className={`nav-link ${location.pathname === "/login" ? "active" : ""}`}
+        >
+          Admin
+        </Link>
+      ) : (
+        <button className="nav-link nav-logout" onClick={onLogout}>
+          Déconnexion
+        </button>
+      )}
+    </nav>
+  );
+}
+
+function AppContent() {
   // 1. Logique et État
   const [count, setCount] = useState(0);
   const port = process.env.REACT_APP_SERVER_PORT;
   let [usersCount, setUsersCount] = useState(0);
+  const [adminToken, setAdminToken] = useState(null);
 
   useEffect(() => {
     async function countUsers() {
@@ -27,6 +64,14 @@ function App() {
 
   const incrementCount = () => {
     setCount((prevCount) => prevCount + 1);
+  };
+
+  const handleLogin = (token) => {
+    setAdminToken(token);
+  };
+
+  const handleLogout = () => {
+    setAdminToken(null);
   };
 
   // 2. Rendu
@@ -48,8 +93,37 @@ function App() {
           <p>{usersCount} user(s) already registered</p>
         </div>
 
-        {/* ===== Formulaire d'inscription ===== */}
-        <RegistrationForm />
+        <Navigation adminToken={adminToken} onLogout={handleLogout} />
+
+        {/* ===== Routes ===== */}
+        <Routes>
+          <Route path="/" element={<RegistrationForm />} />
+          <Route
+            path="/login"
+            element={
+              adminToken ? (
+                <div className="form-card">
+                  <div className="login-icon">✅</div>
+                  <h2>Connecté en tant qu'admin</h2>
+                  <p className="form-subtitle">
+                    Vous avez accès aux fonctionnalités d'administration
+                  </p>
+                  <button className="btn-submit" onClick={handleLogout}>
+                    Se déconnecter
+                  </button>
+                </div>
+              ) : (
+                <LoginForm onLogin={handleLogin} />
+              )
+            }
+          />
+          <Route
+            path="/users"
+            element={
+              <UserList adminToken={adminToken} onLogout={handleLogout} />
+            }
+          />
+        </Routes>
       </header>
       <a
         className="App-link"
@@ -60,6 +134,14 @@ function App() {
         Learn React
       </a>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
   );
 }
 

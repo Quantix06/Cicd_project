@@ -1,5 +1,10 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import RegistrationForm from "./RegistrationForm";
+
+// Mock the formStorage module
+jest.mock("./formStorage.js", () => ({
+  saveFormToDatabase: jest.fn().mockResolvedValue({ message: "OK", id: 1 }),
+}));
 
 // ===== Rendu des champs =====
 
@@ -144,8 +149,8 @@ test("check the email format is invalid", () => {
   expect(errorMessage).toBeInTheDocument();
 });
 
-test("check if the data is stored in localStorage when the form is submitted", () => {
-  const consoleSpy = jest.spyOn(console, "log");
+test("check if the data is sent to the API when the form is submitted", async () => {
+  const { saveFormToDatabase } = require("./formStorage.js");
   render(<RegistrationForm />);
 
   fireEvent.change(screen.getByLabelText("Nom"), {
@@ -169,9 +174,14 @@ test("check if the data is stored in localStorage when the form is submitted", (
 
   fireEvent.click(screen.getByRole("button", { name: /envoyer/i }));
 
-  expect(consoleSpy).toHaveBeenCalledWith(
-    "Formulaire soumis :",
-    expect.any(Object),
-  );
-  consoleSpy.mockRestore();
+  await waitFor(() => {
+    expect(saveFormToDatabase).toHaveBeenCalledWith({
+      nom: "Dupont",
+      prenom: "Jean",
+      email: "jean.dupont@email.com",
+      dateNaissance: "1990-01-01",
+      ville: "Paris",
+      codePostal: "75001",
+    });
+  });
 });
