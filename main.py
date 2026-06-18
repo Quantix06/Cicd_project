@@ -56,6 +56,30 @@ class RegisterRequest(BaseModel):
 
 # --- Endpoints ---
 
+@app.get("/debug/schema")
+async def debug_schema():
+    """Inspect actual DB tables and columns (debug only)."""
+    import traceback
+    try:
+        conn = get_connection()
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SHOW TABLES")
+            tables = [list(row.values())[0] for row in cursor.fetchall()]
+            schema = {}
+            for table in tables:
+                cursor.execute(f"DESCRIBE `{table}`")
+                schema[table] = cursor.fetchall()
+            return {"tables": tables, "schema": schema}
+        finally:
+            conn.close()
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail={"error_type": type(e).__name__, "error_message": str(e), "traceback": traceback.format_exc()},
+        )
+
+
 @app.get("/users")
 async def get_users():
     """Get list of users with reduced information (public)."""
