@@ -4,7 +4,6 @@ import hmac
 import json
 import os
 import time
-from datetime import date, datetime
 from typing import Optional
 
 import pymysql
@@ -57,52 +56,24 @@ class AdminLogin(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# Database connections
+# Database connection
 # ---------------------------------------------------------------------------
 
 def get_connection():
-    """Return a DB connection — local (hors_prod) or Aiven (prod)."""
-    if os.getenv("PYTHON_ENV") in (None, "hors_prod"):
-        return pymysql.connect(
-            db=os.getenv("MYSQL_DATABASE"),
-            user=os.getenv("MYSQL_USER_PY", "root"),
-            password=os.getenv("MYSQL_ROOT_PASSWORD"),
-            port=3306,
-            host=os.getenv("MYSQL_HOST"),
-            charset="utf8mb4",
-        )
-    return get_connection_aiven()
-
-
-def get_connection_aiven():
-    """Create a database connection with SSL support for Aiven Cloud."""
-    ssl_ca = os.getenv("MYSQL_SSL_CA")
-    cert_content = os.getenv("AIVEN_CERTIFICAT")
-
-    # On Vercel the cert is stored as an env var; write it to a temp file.
-    if cert_content and not ssl_ca:
-        import tempfile
-        fd, temp_ca_path = tempfile.mkstemp()
-        with os.fdopen(fd, "w") as f:
-            f.write(cert_content)
-        ssl_ca = temp_ca_path
-
+    """Return a pymysql connection to Aiven using environment variables."""
     timeout = 10
-    connection_args = dict(
+    return pymysql.connect(
         charset="utf8mb4",
         connect_timeout=timeout,
-        read_timeout=timeout,
-        write_timeout=timeout,
+        cursorclass=pymysql.cursors.DictCursor,
         db=os.getenv("MYSQL_DATABASE", "defaultdb"),
-        user=os.getenv("MYSQL_USER", "avnadmin"),
-        password=os.getenv("MYSQL_PASSWORD"),
-        port=int(os.getenv("MYSQL_PORT", 11033)),
         host=os.getenv("MYSQL_HOST"),
+        password=os.getenv("MYSQL_PASSWORD"),
+        read_timeout=timeout,
+        port=int(os.getenv("MYSQL_PORT", 11033)),
+        user=os.getenv("MYSQL_USER", "avnadmin"),
+        write_timeout=timeout,
     )
-    if ssl_ca:
-        connection_args["ssl"] = {"ca": ssl_ca}
-
-    return pymysql.connect(**connection_args)
 
 
 # ---------------------------------------------------------------------------
@@ -209,14 +180,11 @@ def get_user_or_404(cursor, user_id: int, columns: str = ADMIN_USER_COLUMNS):
 async def root():
     """Debug route — shows env state (no secrets)."""
     return {
-        "PYTHON_ENV": os.getenv("PYTHON_ENV"),
         "MYSQL_HOST": os.getenv("MYSQL_HOST"),
         "MYSQL_PORT": os.getenv("MYSQL_PORT"),
         "MYSQL_DATABASE": os.getenv("MYSQL_DATABASE"),
         "MYSQL_USER": os.getenv("MYSQL_USER"),
         "MYSQL_PASSWORD": "***" if os.getenv("MYSQL_PASSWORD") else None,
-        "MYSQL_SSL_CA": os.getenv("MYSQL_SSL_CA"),
-        "AIVEN_CERTIFICAT_SET": bool(os.getenv("AIVEN_CERTIFICAT")),
     }
 
 
