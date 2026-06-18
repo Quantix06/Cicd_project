@@ -6,13 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 app = FastAPI()
-origins = [
-    "https://quantix06.github.io",                                          # GitHub Pages (frontend)
-    "https://cicd-project-git-master-quantix06s-projects.vercel.app",      # Vercel (production)
-    "https://cicd-project-epmtgw9zh-quantix06s-projects.vercel.app",       # Vercel (preview)
-    "http://localhost:3000",                                                 # Dev local React
-    "http://localhost:8000",                                                 # Dev local FastAPI
-]
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
