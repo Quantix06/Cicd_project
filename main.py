@@ -56,15 +56,26 @@ class RegisterRequest(BaseModel):
 @app.get("/users")
 async def get_users():
     """Get list of users with reduced information (public)."""
-    conn = get_connection()
+    import traceback
     try:
-        cursor = conn.cursor(dictionary=True)
-        sql_select_query = "SELECT id, nom, prenom, ville FROM users"
-        cursor.execute(sql_select_query)
-        records = cursor.fetchall()
-        return {"utilisateurs": records}
-    finally:
-        conn.close()
+        conn = get_connection()
+        try:
+            cursor = conn.cursor(dictionary=True)
+            sql_select_query = "SELECT id, nom, prenom, ville FROM users"
+            cursor.execute(sql_select_query)
+            records = cursor.fetchall()
+            return {"utilisateurs": records}
+        finally:
+            conn.close()
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "error_type": type(e).__name__,
+                "error_message": str(e),
+                "traceback": traceback.format_exc(),
+            },
+        )
 
 
 @app.get("/users/{user_id}")
