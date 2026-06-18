@@ -33,6 +33,16 @@ def get_connection():
 def get_connection_aiven():
     """Create a new database connection with optional SSL support for Aiven Cloud."""
     ssl_ca = os.getenv("MYSQL_SSL_CA")
+    cert_content = os.getenv("AIVEN_CERTIFICAT")
+    
+    # Si on est sur Vercel et que le chemin n'est pas défini, on crée un fichier temporaire
+    if cert_content and not ssl_ca:
+        import tempfile
+        fd, temp_ca_path = tempfile.mkstemp()
+        with os.fdopen(fd, 'w') as f:
+            f.write(cert_content)
+        ssl_ca = temp_ca_path
+
     connection_args = dict(
         database=os.getenv("MYSQL_DATABASE", "defaultdb"),
         user=os.getenv("MYSQL_USER", "avnadmin"),
