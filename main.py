@@ -68,6 +68,20 @@ class RegisterRequest(BaseModel):
 
 # --- Endpoints ---
 
+@app.get("/")
+async def root():
+    """Debug route to check environment variables."""
+    return {
+        "PYTHON_ENV": os.getenv("PYTHON_ENV"),
+        "MYSQL_HOST": os.getenv("MYSQL_HOST"),
+        "MYSQL_PORT": os.getenv("MYSQL_PORT"),
+        "MYSQL_DATABASE": os.getenv("MYSQL_DATABASE"),
+        "MYSQL_USER": os.getenv("MYSQL_USER"),
+        "MYSQL_PASSWORD": "***" if os.getenv("MYSQL_PASSWORD") else None,
+        "MYSQL_SSL_CA": os.getenv("MYSQL_SSL_CA"),
+        "AIVEN_CERTIFICAT_SET": bool(os.getenv("AIVEN_CERTIFICAT")),
+    }
+
 @app.get("/users")
 async def get_users():
     """Get list of users with reduced information (public)."""
