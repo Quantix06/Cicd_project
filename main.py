@@ -1,5 +1,4 @@
-import pymysql
-import pymysql.cursors
+import mysql.connector
 import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -18,19 +17,27 @@ app.add_middleware(
 
 
 def get_connection():
-    """Create a new database connection to Aiven MySQL."""
-    timeout = 10
-    return pymysql.connect(
-        charset="utf8mb4",
-        connect_timeout=timeout,
-        cursorclass=pymysql.cursors.DictCursor,
-        db=os.getenv("MYSQL_DATABASE", "defaultdb"),
+    #check if the env is prod or dev and set the connection parameters accordingly
+    if os.getenv("PYTHON_ENV") == None or os.getenv("PYTHON_ENV") == "hors_prod":
+        return mysql.connector.connect(
+        database=os.getenv("MYSQL_DATABASE"),
+        user=os.getenv("MYSQL_USER_PY"),
+        password=os.getenv("MYSQL_ROOT_PASSWORD"),
+        port=3306,
         host=os.getenv("MYSQL_HOST"),
+        )
+    else:
+        return get_connection_aiven()
+
+
+def get_connection_aiven():
+    """Create a new database connection to Aiven Cloud (no SSL)."""
+    return mysql.connector.connect(
+        database=os.getenv("MYSQL_DATABASE", "defaultdb"),
+        user=os.getenv("MYSQL_USER", "avnadmin"),
         password=os.getenv("MYSQL_PASSWORD"),
-        port=int(os.getenv("MYSQL_PORT", 3306)),
-        user=os.getenv("MYSQL_USER"),
-        read_timeout=timeout,
-        write_timeout=timeout,
+        port=int(os.getenv("MYSQL_PORT", 11033)),
+        host=os.getenv("MYSQL_HOST"),
     )
 
 
@@ -51,7 +58,7 @@ async def get_users():
     """Get list of users with reduced information (public)."""
     conn = get_connection()
     try:
-        cursor = conn.cursor()
+        cursor = conn.cursor(dictionary=True)
         sql_select_query = "SELECT id, nom, prenom, ville FROM users"
         cursor.execute(sql_select_query)
         records = cursor.fetchall()
@@ -65,7 +72,7 @@ async def get_user_details(user_id: int):
     """Get full details of a user."""
     conn = get_connection()
     try:
-        cursor = conn.cursor()
+        cursor = conn.cursor(dictionary=True)
         sql_select_query = "SELECT id, nom, prenom, email, date_naissance, ville, code_postal, created_at FROM users WHERE id = %s"
         cursor.execute(sql_select_query, (user_id,))
         record = cursor.fetchone()
@@ -104,7 +111,7 @@ async def register_user(user: RegisterRequest):
         )
         conn.commit()
         return {"message": "Utilisateur inscrit avec succès", "id": cursor.lastrowid}
-    except pymysql.IntegrityError:
+    except mysql.connector.IntegrityError:
         raise HTTPException(
             status_code=400, detail="Cet email est déjà utilisé"
         )
