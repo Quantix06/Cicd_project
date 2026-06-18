@@ -1,8 +1,9 @@
 import axios from "axios";
 
 const port = process.env.REACT_APP_SERVER_PORT || 8000;
+const apiBaseUrl = process.env.REACT_APP_API_URL || (process.env.NODE_ENV === 'production' ? 'https://cicd-project-epmtgw9zh-quantix06s-projects.vercel.app' : `http://localhost:${port}`);
 const api = axios.create({
-  baseURL: `http://localhost:${port}`,
+  baseURL: apiBaseUrl,
 });
 
 /**

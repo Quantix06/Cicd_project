@@ -43,7 +43,8 @@ function Navigation({ adminToken, onLogout }) {
 function AppContent() {
   // 1. Logique et État
   const [count, setCount] = useState(0);
-  const port = process.env.REACT_APP_SERVER_PORT;
+  const port = process.env.REACT_APP_SERVER_PORT || 8000;
+  const apiBaseUrl = process.env.REACT_APP_API_URL || (process.env.NODE_ENV === 'production' ? 'https://cicd-project-epmtgw9zh-quantix06s-projects.vercel.app' : `http://localhost:${port}`);
   let [usersCount, setUsersCount] = useState(0);
   const [adminToken, setAdminToken] = useState(null);
 
@@ -51,7 +52,7 @@ function AppContent() {
     async function countUsers() {
       try {
         const api = axios.create({
-          baseURL: `http://localhost:${port}`,
+          baseURL: apiBaseUrl,
         });
         const response = await api.get(`/users`);
         setUsersCount(response.data.utilisateurs.length);
