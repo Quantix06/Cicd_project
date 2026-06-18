@@ -1,4 +1,5 @@
-import mysql.connector
+import pymysql
+import pymysql.cursors
 import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -19,19 +20,20 @@ app.add_middleware(
 def get_connection():
     #check if the env is prod or dev and set the connection parameters accordingly
     if os.getenv("PYTHON_ENV") == None or os.getenv("PYTHON_ENV") == "hors_prod":
-        return mysql.connector.connect(
-        database=os.getenv("MYSQL_DATABASE"),
-        user=os.getenv("MYSQL_USER_PY"),
-        password=os.getenv("MYSQL_ROOT_PASSWORD"),
-        port=3306,
-        host=os.getenv("MYSQL_HOST"),
+        return pymysql.connect(
+            db=os.getenv("MYSQL_DATABASE"),
+            user=os.getenv("MYSQL_USER_PY", "root"),
+            password=os.getenv("MYSQL_ROOT_PASSWORD"),
+            port=3306,
+            host=os.getenv("MYSQL_HOST"),
+            charset="utf8mb4"
         )
     else:
         return get_connection_aiven()
 
 
 def get_connection_aiven():
-    """Create a new database connection with optional SSL support for Aiven Cloud."""
+    """Create a new database connection with SSL support for Aiven Cloud."""
     ssl_ca = os.getenv("MYSQL_SSL_CA")
     cert_content = os.getenv("AIVEN_CERTIFICAT")
     
@@ -43,17 +45,22 @@ def get_connection_aiven():
             f.write(cert_content)
         ssl_ca = temp_ca_path
 
+    timeout = 10
     connection_args = dict(
-        database=os.getenv("MYSQL_DATABASE", "defaultdb"),
+        charset="utf8mb4",
+        connect_timeout=timeout,
+        read_timeout=timeout,
+        write_timeout=timeout,
+        db=os.getenv("MYSQL_DATABASE", "defaultdb"),
         user=os.getenv("MYSQL_USER", "avnadmin"),
         password=os.getenv("MYSQL_PASSWORD"),
         port=int(os.getenv("MYSQL_PORT", 11033)),
         host=os.getenv("MYSQL_HOST"),
     )
     if ssl_ca:
-        connection_args["ssl_ca"] = ssl_ca
-        connection_args["ssl_verify_cert"] = True
-    return mysql.connector.connect(**connection_args)
+        connection_args["ssl"] = {"ca": ssl_ca}
+        
+    return pymysql.connect(**connection_args)
 
 
 # --- Pydantic models ---
@@ -87,7 +94,7 @@ async def get_users():
     """Get list of users with reduced information (public)."""
     conn = get_connection()
     try:
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
         sql_select_query = "SELECT id, nom, prenom, ville FROM users"
         cursor.execute(sql_select_query)
         records = cursor.fetchall()
@@ -101,7 +108,7 @@ async def get_user_details(user_id: int):
     """Get full details of a user."""
     conn = get_connection()
     try:
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
         sql_select_query = "SELECT id, nom, prenom, email, date_naissance, ville, code_postal, created_at FROM users WHERE id = %s"
         cursor.execute(sql_select_query, (user_id,))
         record = cursor.fetchone()
@@ -140,7 +147,7 @@ async def register_user(user: RegisterRequest):
         )
         conn.commit()
         return {"message": "Utilisateur inscrit avec succès", "id": cursor.lastrowid}
-    except mysql.connector.IntegrityError:
+    except pymysql.err.IntegrityError:
         raise HTTPException(
             status_code=400, detail="Cet email est déjà utilisé"
         )
