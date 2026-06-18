@@ -1,23 +1,28 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import "@testing-library/jest-dom";
 import RegistrationForm from "./RegistrationForm";
 
-// Mock the formStorage module
+// Mock the formStorage module with a jest.fn() accessible from tests
+const mockSaveFormToDatabase = jest.fn();
 jest.mock("./formStorage.js", () => ({
-  saveFormToDatabase: jest.fn().mockResolvedValue({ message: "OK", id: 1 }),
+  saveFormToDatabase: (...args) => mockSaveFormToDatabase(...args),
 }));
+
+beforeEach(() => {
+  mockSaveFormToDatabase.mockReset();
+  mockSaveFormToDatabase.mockResolvedValue({ message: "OK", id: 1 });
+});
 
 // ===== Rendu des champs =====
 
 test("renders the registration form title", () => {
   render(<RegistrationForm />);
-  const title = screen.getByText("Inscription");
-  expect(title).toBeInTheDocument();
+  expect(screen.getByText("Inscription")).toBeInTheDocument();
 });
 
 test("renders the subtitle", () => {
   render(<RegistrationForm />);
-  const subtitle = screen.getByText("Remplissez vos informations personnelles");
-  expect(subtitle).toBeInTheDocument();
+  expect(screen.getByText("Remplissez vos informations personnelles")).toBeInTheDocument();
 });
 
 test("renders the nom field", () => {
@@ -76,106 +81,68 @@ test("renders the submit button", () => {
   expect(button).toHaveAttribute("type", "submit");
 });
 
-// ===== gestion des réponses au formulaire =====
-/**
- * @function managetextinput
- * @description Teste la gestion de la saisie dans les champs de texte
- */
+// ===== Validation des champs =====
+
 test("check when the name contains special characters", () => {
   render(<RegistrationForm />);
-  const input = screen.getByLabelText("Nom");
-  fireEvent.change(input, { target: { value: "Dupont!" } });
-  const errorMessage = screen.getByText(
-    "Le texte ne doit pas contenir de caractères spéciaux.",
-  );
-  expect(errorMessage).toBeInTheDocument();
+  fireEvent.change(screen.getByLabelText("Nom"), { target: { value: "Dupont!" } });
+  expect(screen.getByText("Le texte ne doit pas contenir de caractères spéciaux.")).toBeInTheDocument();
 });
+
 test("check the prenom contains special characters", () => {
   render(<RegistrationForm />);
-  const input = screen.getByLabelText("Prénom");
-  fireEvent.change(input, { target: { value: "Jean!" } });
-  const errorMessage = screen.getByText(
-    "Le texte ne doit pas contenir de caractères spéciaux.",
-  );
-  expect(errorMessage).toBeInTheDocument();
+  fireEvent.change(screen.getByLabelText("Prénom"), { target: { value: "Jean!" } });
+  expect(screen.getByText("Le texte ne doit pas contenir de caractères spéciaux.")).toBeInTheDocument();
 });
+
 test("check the ville contains special characters", () => {
   render(<RegistrationForm />);
-  const input = screen.getByLabelText("Ville");
-  fireEvent.change(input, { target: { value: "Paris!" } });
-  const errorMessage = screen.getByText(
-    "Le texte ne doit pas contenir de caractères spéciaux.",
-  );
-  expect(errorMessage).toBeInTheDocument();
+  fireEvent.change(screen.getByLabelText("Ville"), { target: { value: "Paris!" } });
+  expect(screen.getByText("Le texte ne doit pas contenir de caractères spéciaux.")).toBeInTheDocument();
 });
 
 test("check the date of birth is under 18", () => {
   render(<RegistrationForm />);
-  const input = screen.getByLabelText("Date de naissance");
-  fireEvent.change(input, { target: { value: "2015-01-01" } });
-  const errorMessage = screen.getByText(
-    "Vous devez avoir au moins 18 ans pour vous inscrire.",
-  );
-  expect(errorMessage).toBeInTheDocument();
+  fireEvent.change(screen.getByLabelText("Date de naissance"), { target: { value: "2015-01-01" } });
+  expect(screen.getByText("Vous devez avoir au moins 18 ans pour vous inscrire.")).toBeInTheDocument();
 });
 
 test("check the date of birth is in the future", () => {
   render(<RegistrationForm />);
-  const input = screen.getByLabelText("Date de naissance");
-  fireEvent.change(input, { target: { value: "2050-01-01" } });
-  const errorMessage = screen.getByText(
-    "La date de naissance ne peut pas être dans le futur.",
-  );
-  expect(errorMessage).toBeInTheDocument();
+  fireEvent.change(screen.getByLabelText("Date de naissance"), { target: { value: "2050-01-01" } });
+  expect(screen.getByText("La date de naissance ne peut pas être dans le futur.")).toBeInTheDocument();
 });
 
 test("check the postal code format is invalid", () => {
   render(<RegistrationForm />);
-  const input = screen.getByLabelText("Code postal");
-  fireEvent.change(input, { target: { value: "1234A" } });
-  const errorMessage = screen.getByText(
-    "Le code postal doit contenir 5 chiffres.",
-  );
-  expect(errorMessage).toBeInTheDocument();
+  fireEvent.change(screen.getByLabelText("Code postal"), { target: { value: "1234A" } });
+  expect(screen.getByText("Le code postal doit contenir 5 chiffres.")).toBeInTheDocument();
 });
 
 test("check the email format is invalid", () => {
   render(<RegistrationForm />);
-  const input = screen.getByLabelText("Adresse e-mail");
-  fireEvent.change(input, { target: { value: "invalidemail" } });
-  const errorMessage = screen.getByText(
-    "Le format de l'adresse e-mail est invalide.",
-  );
-  expect(errorMessage).toBeInTheDocument();
+  fireEvent.change(screen.getByLabelText("Adresse e-mail"), { target: { value: "invalidemail" } });
+  expect(screen.getByText("Le format de l'adresse e-mail est invalide.")).toBeInTheDocument();
 });
 
+// ===== Soumission du formulaire =====
+
+function fillForm() {
+  fireEvent.change(screen.getByLabelText("Nom"), { target: { value: "Dupont" } });
+  fireEvent.change(screen.getByLabelText("Prénom"), { target: { value: "Jean" } });
+  fireEvent.change(screen.getByLabelText("Adresse e-mail"), { target: { value: "jean.dupont@email.com" } });
+  fireEvent.change(screen.getByLabelText("Date de naissance"), { target: { value: "1990-01-01" } });
+  fireEvent.change(screen.getByLabelText("Ville"), { target: { value: "Paris" } });
+  fireEvent.change(screen.getByLabelText("Code postal"), { target: { value: "75001" } });
+}
+
 test("check if the data is sent to the API when the form is submitted", async () => {
-  const { saveFormToDatabase } = require("./formStorage.js");
   render(<RegistrationForm />);
-
-  fireEvent.change(screen.getByLabelText("Nom"), {
-    target: { value: "Dupont" },
-  });
-  fireEvent.change(screen.getByLabelText("Prénom"), {
-    target: { value: "Jean" },
-  });
-  fireEvent.change(screen.getByLabelText("Adresse e-mail"), {
-    target: { value: "jean.dupont@email.com" },
-  });
-  fireEvent.change(screen.getByLabelText("Date de naissance"), {
-    target: { value: "1990-01-01" },
-  });
-  fireEvent.change(screen.getByLabelText("Ville"), {
-    target: { value: "Paris" },
-  });
-  fireEvent.change(screen.getByLabelText("Code postal"), {
-    target: { value: "75001" },
-  });
-
+  fillForm();
   fireEvent.click(screen.getByRole("button", { name: /envoyer/i }));
 
   await waitFor(() => {
-    expect(saveFormToDatabase).toHaveBeenCalledWith({
+    expect(mockSaveFormToDatabase).toHaveBeenCalledWith({
       nom: "Dupont",
       prenom: "Jean",
       email: "jean.dupont@email.com",
@@ -183,5 +150,26 @@ test("check if the data is sent to the API when the form is submitted", async ()
       ville: "Paris",
       codePostal: "75001",
     });
+  });
+});
+
+test("affiche le message de succès après soumission valide", async () => {
+  render(<RegistrationForm />);
+  fillForm();
+  fireEvent.click(screen.getByRole("button", { name: /envoyer/i }));
+
+  await waitFor(() => {
+    expect(screen.getByText(/formulaire envoyé avec succès/i)).toBeInTheDocument();
+  });
+});
+
+test("affiche le message d'erreur serveur si l'API échoue (L72)", async () => {
+  mockSaveFormToDatabase.mockRejectedValueOnce(new Error("Erreur de connexion au serveur"));
+  render(<RegistrationForm />);
+  fillForm();
+  fireEvent.click(screen.getByRole("button", { name: /envoyer/i }));
+
+  await waitFor(() => {
+    expect(screen.getByText(/erreur de connexion au serveur/i)).toBeInTheDocument();
   });
 });

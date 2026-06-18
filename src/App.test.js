@@ -10,11 +10,11 @@ const mockDelete = jest.fn();
 jest.mock("axios", () => ({
   __esModule: true,
   default: {
-    create: jest.fn(() => ({
+    create: () => ({
       get: (...args) => mockGet(...args),
       post: (...args) => mockPost(...args),
       delete: (...args) => mockDelete(...args),
-    })),
+    }),
   },
 }));
 

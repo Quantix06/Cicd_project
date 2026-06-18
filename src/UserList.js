@@ -23,6 +23,7 @@ function UserList({ adminToken, onLogout }) {
       setUsers(response.data.utilisateurs);
       setError("");
     } catch (err) {
+      console.error("DEBUG ERROR:", err);
       setError("Erreur lors du chargement des utilisateurs");
     } finally {
       setIsLoading(false);

@@ -7,10 +7,10 @@ const mockAxiosGet = jest.fn();
 jest.mock("axios", () => ({
   __esModule: true,
   default: {
-    create: jest.fn(() => ({
+    create: () => ({
       post: (...args) => mockAxiosPost(...args),
       get: (...args) => mockAxiosGet(...args),
-    })),
+    }),
   },
 }));
 
@@ -70,6 +70,16 @@ describe("saveFormToDatabase", () => {
 
     await expect(saveFormToDatabase(mockFormData)).rejects.toThrow(
       "Erreur de connexion au serveur"
+    );
+  });
+
+  test("lance une erreur générique si response.data existe mais sans 'detail' (L33)", async () => {
+    mockAxiosPost.mockRejectedValue({
+      response: { data: {} }, // data présent mais sans detail
+    });
+
+    await expect(saveFormToDatabase(mockFormData)).rejects.toThrow(
+      "Erreur lors de l'inscription"
     );
   });
 });
