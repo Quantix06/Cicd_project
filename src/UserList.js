@@ -28,7 +28,7 @@ function UserList({ adminToken, onLogout }) {
       setIsLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [port]);
+  }, [apiBaseUrl]);
 
   useEffect(() => {
     fetchUsers();

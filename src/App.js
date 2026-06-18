@@ -61,7 +61,7 @@ function AppContent() {
       }
     }
     countUsers();
-  }, [port]);
+  }, [apiBaseUrl]);
 
   const incrementCount = () => {
     setCount((prevCount) => prevCount + 1);
