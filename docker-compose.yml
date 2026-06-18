@@ -3,7 +3,6 @@ version: "3.1"
 services:
   db:
     image: mysql:9.7
-    container_name: mysql_db_ynov
     restart: always
     ports:
       - "3306:3306"
@@ -12,8 +11,10 @@ services:
     env_file:
       - docker.env
     healthcheck:
-      test: 'mysql --user=$$MYSQL_USER --password=$$MYSQL_ROOT_PASSWORD --execute "SHOW DATABASES;" || exit 1'
+      test: 'mysql --user=root --password=$$MYSQL_ROOT_PASSWORD --execute "SHOW DATABASES;" || exit 1'
       start_period: 3s
+      timeout: 60s
+      retries: 5
   adminer:
     image: adminer
     restart: always

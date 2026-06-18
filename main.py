@@ -18,7 +18,7 @@ app.add_middleware(
 
 def get_connection():
     #check if the env is prod or dev and set the connection parameters accordingly
-    if os.getenv("PYTHON_ENV") == "prod":
+    if os.getenv("PYTHON_ENV") == None or os.getenv("PYTHON_ENV") == "hors_prod":
         return mysql.connector.connect(
         database=os.getenv("MYSQL_DATABASE"),
         user=os.getenv("MYSQL_USER_PY"),
