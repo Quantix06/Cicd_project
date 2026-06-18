@@ -17,14 +17,19 @@ app.add_middleware(
 
 
 def get_connection():
-    """Create a new database connection."""
-    return mysql.connector.connect(
-        database=os.getenv("MYSQL_DATABASE"),
-        user=os.getenv("MYSQL_USER_PY"),
-        password=os.getenv("MYSQL_ROOT_PASSWORD"),
-        port=3306,
+    """Create a new database connection with optional SSL support for Aiven Cloud."""
+    ssl_ca = os.getenv("MYSQL_SSL_CA")
+    connection_args = dict(
+        database=os.getenv("MYSQL_DATABASE", "defaultdb"),
+        user=os.getenv("MYSQL_USER", "avnadmin"),
+        password=os.getenv("MYSQL_PASSWORD"),
+        port=int(os.getenv("MYSQL_PORT", 11033)),
         host=os.getenv("MYSQL_HOST"),
     )
+    if ssl_ca:
+        connection_args["ssl_ca"] = ssl_ca
+        connection_args["ssl_verify_cert"] = True
+    return mysql.connector.connect(**connection_args)
 
 
 # --- Pydantic models ---

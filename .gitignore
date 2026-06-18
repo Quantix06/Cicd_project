@@ -24,3 +24,13 @@ yarn-error.log*
 
 docs
 public/docs
+
+# Docker env (contains credentials — use docker.env.example as template)
+docker.env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Certificat SSL Aiven (ne pas commiter — stocker dans les secrets GitHub)
+certificat/
