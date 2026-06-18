@@ -44,7 +44,7 @@ function AppContent() {
   // 1. Logique et État
   const [count, setCount] = useState(0);
   const port = process.env.REACT_APP_SERVER_PORT || 8000;
-  const apiBaseUrl = process.env.REACT_APP_API_URL || (process.env.NODE_ENV === 'production' ? 'https://cicd-project-epmtgw9zh-quantix06s-projects.vercel.app' : `http://localhost:${port}`);
+  const apiBaseUrl = process.env.REACT_APP_API_URL || (process.env.NODE_ENV === 'production' ? 'https://cicd-project-git-master-quantix06s-projects.vercel.app' : `http://localhost:${port}`);
   let [usersCount, setUsersCount] = useState(0);
   const [adminToken, setAdminToken] = useState(null);
 
