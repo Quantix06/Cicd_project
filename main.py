@@ -17,6 +17,20 @@ app.add_middleware(
 
 
 def get_connection():
+    #check if the env is prod or dev and set the connection parameters accordingly
+    if os.getenv("ENV") == "prod":
+        return mysql.connector.connect(
+        database=os.getenv("MYSQL_DATABASE"),
+        user=os.getenv("MYSQL_USER_PY"),
+        password=os.getenv("MYSQL_ROOT_PASSWORD"),
+        port=3306,
+        host=os.getenv("MYSQL_HOST"),
+        )
+    else:
+        return get_connection_aiven()
+
+
+def get_connection_aiven():
     """Create a new database connection with optional SSL support for Aiven Cloud."""
     ssl_ca = os.getenv("MYSQL_SSL_CA")
     connection_args = dict(
